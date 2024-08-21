@@ -66,8 +66,10 @@ s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
     struct Animation *targetAnim = m->animList->bufTarget;
 
     if (load_patchable_table(m->animList, targetAnimID)) {
-        targetAnim->values = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->values);
-        targetAnim->index = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->index);
+        targetAnim->values =
+            (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->values);
+        targetAnim->index =
+            (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->index);
     }
 
     if (o->header.gfx.animInfo.animID != targetAnimID) {
@@ -99,8 +101,10 @@ s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel)
     struct Animation *targetAnim = m->animList->bufTarget;
 
     if (load_patchable_table(m->animList, targetAnimID)) {
-        targetAnim->values = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->values);
-        targetAnim->index = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->index);
+        targetAnim->values =
+            (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->values);
+        targetAnim->index =
+            (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->index);
     }
 
     if (o->header.gfx.animInfo.animID != targetAnimID) {
@@ -322,8 +326,8 @@ void play_mario_landing_sound(struct MarioState *m, u32 soundBits) {
  * played once per action.
  */
 void play_mario_landing_sound_once(struct MarioState *m, u32 soundBits) {
-    play_mario_action_sound(
-        m, (m->flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_LANDING : soundBits, 1);
+    play_mario_action_sound(m, (m->flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_LANDING : soundBits,
+                            1);
 }
 
 /**
@@ -349,8 +353,10 @@ void play_mario_heavy_landing_sound_once(struct MarioState *m, u32 soundBits) {
  */
 void play_mario_sound(struct MarioState *m, s32 actionSound, s32 marioSound) {
     if (actionSound == SOUND_ACTION_TERRAIN_JUMP) {
-        play_mario_action_sound(m, (m->flags & MARIO_METAL_CAP) ? (s32) SOUND_ACTION_METAL_JUMP
-                                                                : (s32) SOUND_ACTION_TERRAIN_JUMP, 1);
+        play_mario_action_sound(m,
+                                (m->flags & MARIO_METAL_CAP) ? (s32) SOUND_ACTION_METAL_JUMP
+                                                             : (s32) SOUND_ACTION_TERRAIN_JUMP,
+                                1);
     } else {
         play_sound_if_no_flag(m, actionSound, MARIO_ACTION_SOUND_PLAYED);
     }
@@ -1393,7 +1399,7 @@ void update_mario_inputs(struct MarioState *m) {
     if (!(m->input & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED))) {
         m->input |= INPUT_UNKNOWN_5;
     }
-    
+
     // These 3 flags are defined by Bowser stomping attacks
     if (m->marioObj->oInteractStatus
         & (INT_STATUS_MARIO_STUNNED | INT_STATUS_MARIO_KNOCKBACK_DMG | INT_STATUS_MARIO_SHOCKWAVE)) {
@@ -1421,7 +1427,7 @@ void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
     s16 camPreset;
 
     if ((m->action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) {
-        heightBelowWater = (f32)(m->waterLevel - 80) - m->pos[1];
+        heightBelowWater = (f32) (m->waterLevel - 80) - m->pos[1];
         camPreset = m->area->camera->mode;
 
         if (m->action & ACT_FLAG_METAL_WATER) {
@@ -1440,7 +1446,7 @@ void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
             // As long as Mario isn't drowning or at the top
             // of the water with his head out, spawn bubbles.
             if (!(m->action & ACT_FLAG_INTANGIBLE)) {
-                if ((m->pos[1] < (f32)(m->waterLevel - 160)) || (m->faceAngle[0] < -0x800)) {
+                if ((m->pos[1] < (f32) (m->waterLevel - 160)) || (m->faceAngle[0] < -0x800)) {
                     m->particleFlags |= PARTICLE_BUBBLE;
                 }
             }
@@ -1693,6 +1699,39 @@ void func_sh_8025574C(void) {
 }
 #endif
 
+void easy_blj(struct MarioState *m) {
+    /* EASY BLJ */
+    /* D033AFA0 00A0 */ if ((gControllers[0].buttonDown & 0xff00) == 0xa000)
+        /* D033B1C4 00C1 */ if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc1000000)
+            /* 8133B1BC C220 */ *(uint32_t *) &m[0].vel[1] =
+                (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
+    /* D033AFA0 00A0 */ if ((gControllers[0].buttonDown & 0xff00) == 0xa000)
+        /* D033B1C4 00C2 */ if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc2000000)
+            /* 8133B1BC C220 */ *(uint32_t *) &m[0].vel[1] =
+                (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
+    /* D033B1C4 00C3 */ if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc3000000)
+        /* 8133B1BC C220 */ *(uint32_t *) &m[0].vel[1] =
+            (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
+    /* 8033B21D 0004 */ m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x4;
+    /* D033B1C4 00C4 */ if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc4000000)
+        /* 8133B1BC C220 */ *(uint32_t *) &m[0].vel[1] =
+            (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
+    /* 8033B21D 0004 */ m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x4;
+    /* D033AFA0 00A0 */ if ((gControllers[0].buttonDown & 0xff00) == 0xa000)
+        /* 8133AFA0 0000 */ gControllers[0].buttonDown =
+            (gControllers[0].buttonDown & 0xffffffffffff0000) | 0x0;
+}
+
+void infinite_lives(struct MarioState *m) {
+    /* Infinite Lives */
+    /* 8033B21D 0064 */ m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x64;
+}
+
+void infinite_energy_health(struct MarioState *m) {
+    /* Infinite Energy/Health */
+    /* 8133B21E 08FF */ m[0].health = (m[0].health & 0xffffffffffff0000) | 0x8ff;
+}
+
 /**
  * Main function for executing Mario's behavior.
  */
@@ -1750,6 +1789,9 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         squish_mario_model(gMarioState);
         set_submerged_cam_preset_and_spawn_bubbles(gMarioState);
         update_mario_health(gMarioState);
+        infinite_lives(gMarioState);
+        infinite_energy_health(gMarioState);
+        easy_blj(gMarioState);
         update_mario_info_for_cam(gMarioState);
         mario_update_hitbox_and_cap_model(gMarioState);
 
