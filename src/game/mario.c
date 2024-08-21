@@ -1700,36 +1700,42 @@ void func_sh_8025574C(void) {
 #endif
 
 void easy_blj(struct MarioState *m) {
-    /* EASY BLJ */
-    /* D033AFA0 00A0 */ if ((gControllers[0].buttonDown & 0xff00) == 0xa000)
-        /* D033B1C4 00C1 */ if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc1000000)
-            /* 8133B1BC C220 */ *(uint32_t *) &m[0].vel[1] =
-                (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
-    /* D033AFA0 00A0 */ if ((gControllers[0].buttonDown & 0xff00) == 0xa000)
-        /* D033B1C4 00C2 */ if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc2000000)
-            /* 8133B1BC C220 */ *(uint32_t *) &m[0].vel[1] =
-                (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
-    /* D033B1C4 00C3 */ if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc3000000)
-        /* 8133B1BC C220 */ *(uint32_t *) &m[0].vel[1] =
-            (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
-    /* 8033B21D 0004 */ m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x4;
-    /* D033B1C4 00C4 */ if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc4000000)
-        /* 8133B1BC C220 */ *(uint32_t *) &m[0].vel[1] =
-            (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
-    /* 8033B21D 0004 */ m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x4;
-    /* D033AFA0 00A0 */ if ((gControllers[0].buttonDown & 0xff00) == 0xa000)
-        /* 8133AFA0 0000 */ gControllers[0].buttonDown =
-            (gControllers[0].buttonDown & 0xffffffffffff0000) | 0x0;
+
+    /* Easy BLJ */
+    if ((gControllers[0].buttonDown & 0xff00) == 0xa000)
+        if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc1000000)
+            *(uint32_t *) &m[0].vel[1] = (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
+    if ((gControllers[0].buttonDown & 0xff00) == 0xa000)
+        if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc2000000)
+            *(uint32_t *) &m[0].vel[1] = (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
+    if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc3000000)
+        *(uint32_t *) &m[0].vel[1] = (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
+    m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x4;
+    if ((*(uint32_t *) &m[0].forwardVel & 0xff000000) == 0xc4000000)
+        *(uint32_t *) &m[0].vel[1] = (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0xc2200000;
+    m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x4;
+    if ((gControllers[0].buttonDown & 0xff00) == 0xa000)
+        gControllers[0].buttonDown = (gControllers[0].buttonDown & 0xffffffffffff0000) | 0x0;
 }
 
 void infinite_lives(struct MarioState *m) {
     /* Infinite Lives */
-    /* 8033B21D 0064 */ m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x64;
+    m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x64;
 }
 
 void infinite_energy_health(struct MarioState *m) {
     /* Infinite Energy/Health */
-    /* 8133B21E 08FF */ m[0].health = (m[0].health & 0xffffffffffff0000) | 0x8ff;
+    m[0].health = (m[0].health & 0xffffffffffff0000) | 0x8ff;
+}
+
+void press_l_levitate(struct MarioState *m) {
+    /* Press L to Levitate */
+    if ((gControllers[0].buttonDown & 0xff) == 0x20)
+        *(uint32_t *) &m[0].vel[1] = (*(uint32_t *) &m[0].vel[1] & 0xffffffff0000ffff) | 0x42200000;
+    if ((gControllers[0].buttonDown & 0xff) == 0x20)
+        m[0].action = (m[0].action & 0xffffffff0000ffff) | 0x3000000;
+    if ((gControllers[0].buttonDown & 0xff) == 0x20)
+        m[0].action = (m[0].action & 0xffffffffffff0000) | 0x880;
 }
 
 /**
@@ -1792,6 +1798,7 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         infinite_lives(gMarioState);
         infinite_energy_health(gMarioState);
         easy_blj(gMarioState);
+        press_l_levitate(gMarioState);
         update_mario_info_for_cam(gMarioState);
         mario_update_hitbox_and_cap_model(gMarioState);
 
