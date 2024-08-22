@@ -1720,7 +1720,8 @@ void easy_blj(struct MarioState *m) {
 
 void infinite_lives(struct MarioState *m) {
     /* Infinite Lives */
-    m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x64;
+    if (m[0].numLives < 4)
+        m[0].numLives = (m[0].numLives & 0xffffffffffffff00) | 0x64;
 }
 
 void infinite_energy_health(struct MarioState *m) {
